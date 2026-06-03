@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TU SISTEMA — Tu Institución</title>
+
+  <!-- FUENTES: reemplaza según tu diseño -->
+  <link href="https://fonts.googleapis.com/css2?family=TU_FUENTE_DISPLAY&family=TU_FUENTE_CUERPO&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================
+       VARIABLES DE DISEÑO
+       Centraliza aquí colores, radios y sombras del sistema
+       ===================================================== */
+    :root {
+      --color-primario:       #TU_COLOR_PRIMARIO;
+      --color-primario-dark:  #TU_COLOR_OSCURO;
+      --color-primario-light: #TU_COLOR_CLARO;
+      --color-fondo:          #f5f5f7;
+      --color-borde:          #dde1e7;
+      --color-texto:          #1a1a2e;
+      --color-texto-sub:      #5a5f72;
+      --color-blanco:         #ffffff;
+      --radio:                12px;
+      --sombra:               0 8px 40px rgba(0,0,0,0.08);
+    }
+
+    /* =====================================================
+       RESET Y BASE
+       ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'TU_FUENTE_CUERPO', sans-serif;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      min-height: 100vh;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+    header {
+      background: linear-gradient(135deg, #TU_COLOR_A, #TU_COLOR_B);
+      padding: 36px 24px 48px;
+      text-align: center;
+    }
+    header h1 { color: #fff; font-size: clamp(20px, 4vw, 30px); }
+    header p  { color: rgba(255,255,255,0.75); font-size: 14px; }
+
+    /* =====================================================
+       BARRA DE PROGRESO
+       ===================================================== */
+    .progress-wrap {
+      background: var(--color-blanco);
+      border-bottom: 1px solid var(--color-borde);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .progress-bar  { flex: 1; height: 6px; background: var(--color-borde); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--color-primario); border-radius: 3px; width: 0%; transition: width 0.5s ease; }
+    .progress-label { font-size: 12px; font-weight: 600; color: var(--color-primario); }
+
+    /* =====================================================
+       CONTENEDOR Y PASOS
+       ===================================================== */
+    .container { max-width: 680px; margin: 0 auto; padding: 32px 16px 60px; }
+    .step { display: none; }
+    .step.active { display: block; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =====================================================
+       ENCABEZADO DE PASO
+       ===================================================== */
+    .step-header    { margin-bottom: 28px; }
+    .step-number    { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--color-primario); margin-bottom: 6px; }
+    .step-title     { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .step-desc      { font-size: 14px; color: var(--color-texto-sub); line-height: 1.6; }
+
+    /* =====================================================
+       TARJETA
+       ===================================================== */
+    .card {
+      background: var(--color-blanco);
+      border-radius: var(--radio);
+      border: 1px solid var(--color-borde);
+      padding: 28px;
+      margin-bottom: 16px;
+      box-shadow: var(--sombra);
+    }
+
+    /* =====================================================
+       CAMPOS DE FORMULARIO
+       ===================================================== */
+    .field       { margin-bottom: 22px; }
+    .field:last-child { margin-bottom: 0; }
+    label        { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+    label .req   { color: var(--color-primario); margin-left: 2px; }
+    .hint        { font-size: 12px; color: var(--color-texto-sub); margin-top: 5px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--color-borde);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--color-texto);
+      background: var(--color-blanco);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--color-primario);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+    input.error, select.error { border-color: #e74c3c; }
+
+    /* =====================================================
+       CHIPS DE SELECCIÓN (ej: Sede)
+       ===================================================== */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip  {
+      border: 1.5px solid var(--color-borde);
+      border-radius: 20px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover   { border-color: var(--color-primario); color: var(--color-primario); }
+    .chip.selected { background: var(--color-primario); border-color: var(--color-primario); color: #fff; }
+
+    /* =====================================================
+       OPCIONES RADIO VISUALES
+       ===================================================== */
+    .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .radio-grid { grid-template-columns: 1fr; } }
+
+    .radio-option {
+      border: 1.5px solid var(--color-borde);
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .radio-option input { display: none; }
+    .radio-option:hover  { border-color: var(--color-primario); background: var(--color-primario-light); }
+    .radio-option.selected { border-color: var(--color-primario); background: var(--color-primario-light); color: var(--color-primario-dark); }
+    .radio-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--color-borde); flex-shrink: 0; transition: all 0.2s; }
+    .radio-option.selected .radio-dot { border-color: var(--color-primario); background: var(--color-primario); box-shadow: inset 0 0 0 3px #fff; }
+
+    /* =====================================================
+       ZONA DE CARGA DE ARCHIVOS
+       ===================================================== */
+    .file-zone {
+      border: 2px dashed var(--color-borde);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+      background: var(--color-fondo);
+    }
+    .file-zone:hover, .file-zone.dragover { border-color: var(--color-primario); background: var(--color-primario-light); }
+    .file-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; padding: 0; }
+    .file-zone p    { font-size: 13px; color: var(--color-texto-sub); pointer-events: none; }
+    .file-zone strong { color: var(--color-primario); }
+    .file-name { margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--color-primario); background: var(--color-primario-light); padding: 4px 10px; border-radius: 20px; display: inline-block; }
+
+    /* =====================================================
+       FILAS DE AUTORES MÚLTIPLES
+       ===================================================== */
+    .autor-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .btn-remove-autor {
+      background: none; border: 1.5px solid var(--color-borde); border-radius: 8px;
+      width: 38px; height: 38px; cursor: pointer; font-size: 16px; color: #e74c3c;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .btn-remove-autor:hover { background: #fee2e2; border-color: #e74c3c; }
+    .btn-add-autor {
+      background: none; border: 1.5px dashed var(--color-borde); border-radius: 8px;
+      padding: 10px; width: 100%; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: var(--color-texto-sub); transition: all 0.2s; margin-top: 4px;
+    }
+    .btn-add-autor:hover { border-color: var(--color-primario); color: var(--color-primario); }
+
+    /* =====================================================
+       BOTONES DE NAVEGACIÓN
+       ===================================================== */
+    .nav-buttons { display: flex; gap: 12px; margin-top: 28px; }
+    .btn { padding: 14px 28px; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; flex: 1; }
+    .btn-primary { background: linear-gradient(135deg, var(--color-primario), var(--color-primario-dark)); color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: var(--color-blanco); color: var(--color-texto); border: 1.5px solid var(--color-borde); }
+    .btn-secondary:hover { border-color: var(--color-primario); color: var(--color-primario); }
+
+    /* =====================================================
+       RESUMEN / SUMMARY
+       ===================================================== */
+    .summary-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--color-borde); font-size: 13px; gap: 12px; }
+    .summary-item:last-child { border-bottom: none; }
+    .summary-key { color: var(--color-texto-sub); font-weight: 500; flex-shrink: 0; }
+    .summary-val { font-weight: 600; text-align: right; }
+
+    /* =====================================================
+       PANTALLA DE ÉXITO
+       ===================================================== */
+    .success-screen { text-align: center; padding: 40px 20px; }
+    .success-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #27ae60, #2ecc71); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 24px; }
+    .success-screen h2 { font-size: 26px; margin-bottom: 12px; }
+    .success-screen p { color: var(--color-texto-sub); font-size: 14px; line-height: 1.7; }
+    .success-id { display: inline-block; background: var(--color-fondo); border: 1px solid var(--color-borde); border-radius: 8px; padding: 10px 20px; font-weight: 700; color: var(--color-primario); font-size: 15px; margin: 16px 0; letter-spacing: 1px; }
+
+    /* =====================================================
+       OVERLAY DE CARGA
+       ===================================================== */
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.92); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+    .loading-overlay.show { display: flex; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--color-borde); border-top-color: var(--color-primario); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay p { font-weight: 600; color: var(--color-texto-sub); font-size: 14px; }
+
+    /* =====================================================
+       MENSAJES DE ERROR
+       ===================================================== */
+    .error-msg { font-size: 12px; color: #e74c3c; margin-top: 4px; display: none; }
+    .error-msg.show { display: block; }
+
+    /* =====================================================
+       CAJA INFORMATIVA
+       ===================================================== */
+    .info-box { background: #eaf4fb; border-left: 4px solid #2980b9; border-radius: 6px; padding: 12px 16px; font-size: 13px; color: #1a5276; margin-bottom: 20px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<!-- OVERLAY DE CARGA -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Enviando solicitud…</p>
+</div>
+
+<!-- HEADER -->
+<header>
+  <h1>TÍTULO DE TU SISTEMA</h1>
+  <p>Tu institución — Área o dependencia</p>
+</header>
+
+<!-- BARRA DE PROGRESO -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">Paso 1 de N</div>
+</div>
+
+<div class="container">
+
+  <!-- ========== PASO 1 ========== -->
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-number">Paso 1 de N</div>
+      <div class="step-title">Título del paso</div>
+      <div class="step-desc">Descripción breve de qué debe completar el usuario aquí.</div>
+    </div>
+    <div class="card">
+      <!-- CAMPO TEXTO -->
+      <div class="field">
+        <label>Nombre del campo <span class="req">*</span></label>
+        <input type="text" id="miCampo" placeholder="Ejemplo de valor">
+        <div class="hint">Texto de ayuda opcional.</div>
+        <div class="error-msg" id="err-miCampo">Mensaje de error.</div>
+      </div>
+
+      <!-- CHIPS (selección única) -->
+      <div class="field">
+        <label>Selección por chips <span class="req">*</span></label>
+        <div class="chips" id="miChipsGroup">
+          <div class="chip" data-val="Opcion1" onclick="selectChip(this,'miGrupo')">Opción 1</div>
+          <div class="chip" data-val="Opcion2" onclick="selectChip(this,'miGrupo')">Opción 2</div>
+          <div class="chip" data-val="Opcion3" onclick="selectChip(this,'miGrupo')">Opción 3</div>
+        </div>
+        <div class="error-msg" id="err-miGrupo">Selecciona una opción.</div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-primary" onclick="goNext(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ========== PASO 2 ========== -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-number">Paso 2 de N</div>
+      <div class="step-title">Título del paso</div>
+      <div class="step-desc">Descripción.</div>
+    </div>
+    <div class="card">
+      <!-- SELECT CON DEPENDENCIA -->
+      <div class="field">
+        <label>Selector principal <span class="req">*</span></label>
+        <select id="selectorPrincipal" onchange="filtrarOpciones()">
+          <option value="">— Selecciona —</option>
+          <option>Categoría A</option>
+          <option>Categoría B</option>
+        </select>
+        <div class="error-msg" id="err-selectorPrincipal">Selecciona una opción.</div>
+      </div>
+      <div class="field">
+        <label>Selector dependiente <span class="req">*</span></label>
+        <select id="selectorDependiente" disabled>
+          <option value="">— Primero selecciona la categoría —</option>
+        </select>
+        <div class="error-msg" id="err-selectorDependiente">Selecciona una opción.</div>
+      </div>
+
+      <!-- RADIO VISUAL -->
+      <div class="field">
+        <label>Tipo de documento <span class="req">*</span></label>
+        <div class="radio-grid" id="tipoDocGrid">
+          <label class="radio-option" onclick="selectRadio(this,'tipoDoc')">
+            <input type="radio" name="tipoDoc" value="Tipo A">
+            <div class="radio-dot"></div> Tipo A
+          </label>
+          <label class="radio-option" onclick="selectRadio(this,'tipoDoc')">
+            <input type="radio" name="tipoDoc" value="Tipo B">
+            <div class="radio-dot"></div> Tipo B
+          </label>
+        </div>
+        <div class="error-msg" id="err-tipoDoc">Selecciona el tipo.</div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goNext(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ========== PASO 3 — ARCHIVOS ========== -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-number">Paso 3 de N</div>
+      <div class="step-title">Archivos requeridos</div>
+      <div class="step-desc">Adjunta los documentos en formato PDF.</div>
+    </div>
+    <div class="info-box">
+      📌 Texto informativo sobre qué pasará con los archivos.
+    </div>
+    <div class="card">
+      <!-- ZONA DE ARCHIVO (repite por cada archivo requerido) -->
+      <div class="field">
+        <label>📄 Nombre del documento <span class="req">*</span></label>
+        <div class="file-zone" id="zone-archivo1">
+          <input type="file" id="file-archivo1" accept=".pdf" onchange="handleFile(this,'archivo1')">
+          <div style="font-size:28px;margin-bottom:8px;">📋</div>
+          <p>Arrastra el PDF aquí o <strong>haz clic para seleccionar</strong></p>
+          <div class="file-name" id="fname-archivo1" style="display:none"></div>
+        </div>
+        <div class="error-msg" id="err-archivo1">Adjunta el documento.</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN ANTES DE ENVIAR -->
+    <div class="card" style="margin-top:20px;">
+      <p style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--color-texto-sub);text-transform:uppercase;letter-spacing:1px;">Resumen de tu solicitud</p>
+      <div class="summary-item"><span class="summary-key">Campo 1</span><span class="summary-val" id="rev-campo1">—</span></div>
+      <div class="summary-item"><span class="summary-key">Campo 2</span><span class="summary-val" id="rev-campo2">—</span></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Atrás</button>
+      <button class="btn btn-primary" id="btnEnviar" onclick="enviarFormulario()">🚀 Enviar</button>
+    </div>
+  </div>
+
+  <!-- ========== PANTALLA DE ÉXITO ========== -->
+  <div class="step" id="stepSuccess">
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <h2>¡Solicitud enviada!</h2>
+      <p>Mensaje de confirmación para el usuario.</p>
+      <div class="success-id" id="successId">ID-…</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+//  DATOS DEPENDIENTES
+//  Objeto que mapea cada opción del selector principal
+//  con sus opciones del selector dependiente.
+// ============================================================
+const OPCIONES_DEPENDIENTES = {
+  "Categoría A": ["Opción A1", "Opción A2", "Opción A3"],
+  "Categoría B": ["Opción B1", "Opción B2"]
+};
+
+// ============================================================
+//  ESTADO GLOBAL
+// ============================================================
+let state       = { miGrupo: "", tipoDoc: "" };
+let currentStep = 1;
+const TOTAL_STEPS = 3; // ajusta según el número de pasos
+let autorCount  = 1;
+
+// ============================================================
+//  NAVEGACIÓN
+// ============================================================
+function updateProgress(step) {
+  const pct = ((step - 1) / TOTAL_STEPS) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    step <= TOTAL_STEPS ? `Paso ${step} de ${TOTAL_STEPS}` : '¡Completado!';
+}
+
+function goStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext(from) {
+  if (!validateStep(from)) return;
+  if (from === TOTAL_STEPS - 1) updateResumen(); // actualiza resumen antes del último paso
+  goStep(from + 1);
+}
+
+// ============================================================
+//  VALIDACIÓN POR PASO
+//  Agrega aquí las reglas de cada paso.
+// ============================================================
+function validateStep(step) {
+  let ok = true;
+
+  if (step === 1) {
+    const campo = document.getElementById('miCampo').value.trim();
+    showErr('miCampo',  !campo);
+    showErr('miGrupo',  !state.miGrupo);
+    ok = !!campo && !!state.miGrupo;
+  }
+
+  if (step === 2) {
+    const p = document.getElementById('selectorPrincipal').value;
+    const d = document.getElementById('selectorDependiente').value;
+    showErr('selectorPrincipal',   !p);
+    showErr('selectorDependiente', !d);
+    showErr('tipoDoc', !state.tipoDoc);
+    ok = !!p && !!d && !!state.tipoDoc;
+  }
+
+  if (step === 3) {
+    const a1 = document.getElementById('file-archivo1').files[0];
+    showErr('archivo1', !a1);
+    ok = !!a1;
+  }
+
+  return ok;
+}
+
+function showErr(id, show) {
+  const el = document.getElementById('err-' + id);
+  if (el) el.classList.toggle('show', show);
+  const input = document.getElementById(id);
+  if (input) input.classList.toggle('error', show);
+}
+
+// ============================================================
+//  CHIPS Y RADIOS
+// ============================================================
+function selectChip(el, group) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state[group] = el.dataset.val;
+  showErr(group, false);
+}
+
+function selectRadio(el, group) {
+  document.querySelectorAll(`#tipoDocGrid .radio-option`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state[group] = el.querySelector('input').value;
+  showErr(group, false);
+}
+
+// ============================================================
+//  SELECTOR DEPENDIENTE
+// ============================================================
+function filtrarOpciones() {
+  const principal  = document.getElementById('selectorPrincipal').value;
+  const dependiente = document.getElementById('selectorDependiente');
+  dependiente.innerHTML = '<option value="">— Selecciona —</option>';
+
+  if (principal && OPCIONES_DEPENDIENTES[principal]) {
+    OPCIONES_DEPENDIENTES[principal].forEach(op => {
+      const opt = document.createElement('option');
+      opt.value = op; opt.textContent = op;
+      dependiente.appendChild(opt);
+    });
+    dependiente.disabled = false;
+  } else {
+    dependiente.disabled = true;
+    dependiente.innerHTML = '<option value="">— Primero selecciona la categoría —</option>';
+  }
+  showErr('selectorPrincipal', false);
+  showErr('selectorDependiente', false);
+}
+
+// ============================================================
+//  AUTORES MÚLTIPLES (si aplica)
+// ============================================================
+function getAutores() {
+  return Array.from(document.querySelectorAll('.autor-input'))
+    .map(i => i.value.trim()).filter(v => v !== '');
+}
+function addAutor() {
+  const container = document.getElementById('autoresContainer');
+  const idx = autorCount++;
+  const row = document.createElement('div');
+  row.className = 'autor-row';
+  row.id = 'autorRow' + idx;
+  row.innerHTML = `
+    <input type="text" class="autor-input" placeholder="Apellido, Nombre">
+    <button class="btn-remove-autor" onclick="removeAutor(${idx})">✕</button>`;
+  container.appendChild(row);
+  updateRemoveButtons();
+}
+function removeAutor(idx) {
+  const row = document.getElementById('autorRow' + idx);
+  if (row) row.remove();
+  updateRemoveButtons();
+}
+function updateRemoveButtons() {
+  const rows = document.querySelectorAll('.autor-row');
+  rows.forEach(r => {
+    const btn = r.querySelector('.btn-remove-autor');
+    if (btn) btn.style.display = rows.length > 1 ? 'flex' : 'none';
+  });
+}
+
+// ============================================================
+//  MANEJO DE ARCHIVOS
+// ============================================================
+function handleFile(input, key) {
+  const file = input.files[0];
+  const fname = document.getElementById('fname-' + key);
+  const zone  = document.getElementById('zone-' + key);
+  if (file) {
+    fname.textContent = '✓ ' + file.name;
+    fname.style.display = 'inline-block';
+    zone.style.borderColor = 'var(--color-primario)';
+    zone.style.background  = 'var(--color-primario-light)';
+    showErr(key, false);
+  }
+}
+
+// Drag & drop — repite el array con los IDs de tus zonas de archivo
+['archivo1'].forEach(key => {
+  const zone = document.getElementById('zone-' + key);
+  if (!zone) return;
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', ()  => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const input = document.getElementById('file-' + key);
+    input.files = e.dataTransfer.files;
+    handleFile(input, key);
+  });
+});
+
+// ============================================================
+//  RESUMEN
+// ============================================================
+function updateResumen() {
+  document.getElementById('rev-campo1').textContent = document.getElementById('miCampo').value;
+  document.getElementById('rev-campo2').textContent = state.miGrupo;
+  // Agrega más campos según tu formulario
+}
+
+// ============================================================
+//  CONVERSIÓN A BASE64
+// ============================================================
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Error leyendo archivo'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ============================================================
+//  ENVÍO DEL FORMULARIO
+// ============================================================
+async function enviarFormulario() {
+  if (!validateStep(TOTAL_STEPS)) return;
+
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.getElementById('btnEnviar').disabled = true;
+
+  try {
+    // Convierte archivos a base64
+    const b64Archivo1 = await fileToBase64(document.getElementById('file-archivo1').files[0]);
+
+    const payload = {
+      // Agrega aquí todos los campos de tu formulario
+      campo1:  document.getElementById('miCampo').value.trim(),
+      grupo:   state.miGrupo,
+      tipoDoc: state.tipoDoc,
+      archivos: {
+        archivo1: {
+          nombre: document.getElementById('file-archivo1').files[0].name,
+          tipo:   document.getElementById('file-archivo1').files[0].type,
+          datos:  b64Archivo1
+        }
+      }
+    };
+
+    // Llama a la función del servidor
+    google.script.run
+      .withSuccessHandler(function(result) {
+        document.getElementById('loadingOverlay').classList.remove('show');
+        if (result && result.ok) {
+          document.getElementById('step' + TOTAL_STEPS).classList.remove('active');
+          document.getElementById('stepSuccess').classList.add('active');
+          document.getElementById('successId').textContent = result.id || 'OK';
+          document.getElementById('progressFill').style.width = '100%';
+          document.getElementById('progressLabel').textContent = '¡Completado!';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          document.getElementById('btnEnviar').disabled = false;
+          alert('❌ Error: ' + (result ? result.error : 'Error desconocido'));
+        }
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('loadingOverlay').classList.remove('show');
+        document.getElementById('btnEnviar').disabled = false;
+        alert('❌ Error al enviar: ' + err.message);
+      })
+      .procesarFormulario(JSON.stringify(payload)); // nombre de la función en Procesador.gs
+
+  } catch (err) {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('btnEnviar').disabled = false;
+    alert('❌ Error: ' + err.message);
+  }
+}
+</script>
+</body>
+</html>
