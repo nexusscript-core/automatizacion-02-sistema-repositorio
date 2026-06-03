@@ -122,42 +122,45 @@ const CONFIG = {
 
 ## 🔗 Diagrama de interconexión
 
+```
 Estudiante (navegador)
-│
-│  Web App URL (doGet)
-▼
-Formulario.html ── 4 pasos ──▶ google.script.run.procesarFormulario()
-│
-Procesador.gs
-│
-┌───────────────────┼────────────────────┐
-▼                   ▼                    ▼
-DriveApp            SpreadsheetApp         GmailApp
-(crea carpetas,        (registra fila en     ┌──────────────┐
-sube 3 PDFs,           Control Digitk)      │ Confirmación │
-comparte link)                              │ → Estudiante │
-├──────────────┤
-│ Notificación │
-│ → Bibliotec. │
-│  (con botones│
-│  de acción)  │
-└──────────────┘
-│
-Botón APROBAR / RECHAZAR /
-INCOMPLETO / DIGITK
-│
-doGet (acción + id)
-│
-Código.gs actualiza estado
-en hoja + correo al estudiante
-│
-Si DIGITK → carpeta se mueve
-a "Proceso terminado" en Drive
+        │
+        │  Web App URL (doGet)
+        ▼
+   Formulario.html ── 4 pasos ──▶ google.script.run.procesarFormulario()
+                                           │
+                                     Procesador.gs
+                          ┌──────────────────┼──────────────────┐
+                          ▼                  ▼                  ▼
+                      DriveApp        SpreadsheetApp         GmailApp
+                 Crea carpetas,     Registra fila en     ┌─────────────────┐
+                 sube 3 PDFs,       Control Digitk       │  Confirmación   │
+                 comparte link                           │  → Estudiante   │
+                                                         ├─────────────────┤
+                                                         │  Notificación   │
+                                                         │  → Bibliotecario│
+                                                         │  [APROBAR]      │
+                                                         │  [RECHAZAR]     │
+                                                         │  [INCOMPLETO]   │
+                                                         │  [DIGITK]       │
+                                                         └────────┬────────┘
+                                                                  │
+                                                  doGet (acción + id)
+                                                                  │
+                                                            Código.gs
+                                                  Actualiza estado en hoja
+                                                  + correo al estudiante
+                                                                  │
+                                          Si DIGITK ─────────────▼
+                                                         Drive: carpeta →
+                                                       "Proceso terminado"
+
 Trigger diario (8:00 a.m.)
-│
-▼
-revisionDiaria() → alerta al colaborador si
-solicitud lleva +3 días sin revisión
+        │
+        ▼
+revisionDiaria()
+→ Alerta al colaborador si solicitud lleva +3 días sin revisión
+```
 
 ---
 
